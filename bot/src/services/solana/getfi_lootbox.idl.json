@@ -1,0 +1,2282 @@
+{
+  "address": "Bm6zsJgc87Hj6gGEtpHtyjP89Lwuu7TequM6dgPL8LA7",
+  "metadata": {
+    "name": "getfi_lootbox",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "cancel_lootbox_batch",
+      "docs": [
+        "Close a LootboxBatchRequest and refund its rent to backend_signer.",
+        "Two callers (off-chain crank): post-consume cleanup, and abandoned-",
+        "batch cleanup. Only releases the daily-cap reservation when the",
+        "batch was *not* consumed (consumed batches already promoted their",
+        "reservation in `consume_lootbox_batch`)."
+      ],
+      "discriminator": [
+        143,
+        62,
+        19,
+        244,
+        26,
+        32,
+        241,
+        214
+      ],
+      "accounts": [
+        {
+          "name": "backend_signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player"
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101,
+                  95,
+                  118,
+                  51
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lootbox_batch",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close_inventory_v2",
+      "docs": [
+        "Admin escape hatch: tear the inventory_v2 PDA down so it can be",
+        "re-initialized from scratch. UncheckedAccount on purpose so a stale",
+        "layout does not lock us out (see commit-reveal docs above)."
+      ],
+      "discriminator": [
+        171,
+        140,
+        112,
+        12,
+        226,
+        194,
+        237,
+        137
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "inventory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  118,
+                  101,
+                  110,
+                  116,
+                  111,
+                  114,
+                  121,
+                  95,
+                  118,
+                  50
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "consume_lootbox_batch",
+      "docs": [
+        "Reveal-and-roll. Backend supplies the preimage of the commitment it",
+        "posted in `request_lootbox_batch`; the program verifies the hash,",
+        "derives the per-box rolls, transfers rewards, and updates the daily",
+        "counter. PDA stays open so the frontend can read the rewards array;",
+        "the off-chain crank closes it via `cancel_lootbox_batch` to recover",
+        "rent."
+      ],
+      "discriminator": [
+        76,
+        109,
+        104,
+        100,
+        249,
+        198,
+        100,
+        6
+      ],
+      "accounts": [
+        {
+          "name": "backend_signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player"
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "inventory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  118,
+                  101,
+                  110,
+                  116,
+                  111,
+                  114,
+                  121,
+                  95,
+                  118,
+                  50
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101,
+                  95,
+                  118,
+                  51
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lootbox_batch",
+          "writable": true
+        },
+        {
+          "name": "reward_mint"
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "config"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "reward_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "player_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "player"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "reward_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "backend_seed",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "deposit_fuel",
+      "docs": [
+        "Top up the user's FuelVault with SOL. From this point on the SOL",
+        "physically lives in the FuelVault PDA (a SystemAccount, no data,",
+        "no rent lock) — the agent cannot touch it; only this program can,",
+        "and only via the two narrow paths in `open_box_as_agent` and",
+        "`withdraw_fuel`."
+      ],
+      "discriminator": [
+        240,
+        239,
+        7,
+        214,
+        144,
+        47,
+        112,
+        119
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "agent_authority",
+          "docs": [
+            "Tying deposits to a registered agent keeps the mental model",
+            "\"fuel exists for an agent\" — preventing orphan vaults."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fuel_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  117,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initialize_config",
+      "discriminator": [
+        208,
+        127,
+        21,
+        1,
+        194,
+        190,
+        196,
+        70
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "inventory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  118,
+                  101,
+                  110,
+                  116,
+                  111,
+                  114,
+                  121,
+                  95,
+                  118,
+                  50
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "backend_signer",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "initialize_inventory_v2",
+      "docs": [
+        "One-shot admin migration helper; init's the v2 inventory PDA when",
+        "`Config` is already on-chain."
+      ],
+      "discriminator": [
+        29,
+        61,
+        137,
+        116,
+        236,
+        76,
+        78,
+        51
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "inventory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  118,
+                  101,
+                  110,
+                  116,
+                  111,
+                  114,
+                  121,
+                  95,
+                  118,
+                  50
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "open_box_as_agent",
+      "docs": [
+        "Single-tx merge of `request_lootbox_batch + consume_lootbox_batch`",
+        "for the autonomous-agent flow. The agent signs the on-chain tx;",
+        "the backend signs the ed25519 message that binds",
+        "(player_entropy, backend_commitment, nonce_counter); the program",
+        "verifies the reveal in the same tx (no separate consume needed).",
+        "",
+        "Cost flow — all paid out of the FuelVault, the user pays nothing",
+        "in this tx:",
+        "- `LOOTBOX_FEE_LAMPORTS * box_count`  → TREASURY",
+        "- `AGENT_TX_FEE_REIMBURSEMENT`        → agent (covers tx fee)",
+        "",
+        "GET rewards always go straight to the user's ATA, never to the",
+        "agent. The PlayerStateV3 daily-cap counter is intentionally NOT",
+        "touched here — agent box opens are rate-limited off-chain by",
+        "the bot's 3-day cadence. We do read/update `has_won_major_prize`",
+        "so anti-whale logic stays consistent with the user-facing flow."
+      ],
+      "discriminator": [
+        210,
+        231,
+        206,
+        56,
+        130,
+        75,
+        39,
+        51
+      ],
+      "accounts": [
+        {
+          "name": "agent",
+          "docs": [
+            "Agent (bot hot wallet) — feePayer + signer of the on-chain tx.",
+            "Reimbursed exactly `AGENT_TX_FEE_REIMBURSEMENT` from the FuelVault",
+            "before the ix returns."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user",
+          "docs": [
+            "User the agent is acting for. Not a signer — that's the whole",
+            "point of the delegation. PDA derivation + the explicit",
+            "require_keys_eq in the handler enforce identity."
+          ]
+        },
+        {
+          "name": "backend_signer",
+          "docs": [
+            "authorization is proven by the preceding ed25519 verify ix."
+          ]
+        },
+        {
+          "name": "agent_authority",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fuel_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  117,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "inventory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  118,
+                  101,
+                  110,
+                  116,
+                  111,
+                  114,
+                  121,
+                  95,
+                  118,
+                  50
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_state",
+          "docs": [
+            "Read-only for `has_won_major_prize`; daily counters intentionally",
+            "untouched in the agent flow."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101,
+                  95,
+                  118,
+                  51
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint"
+        },
+        {
+          "name": "vault_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "config"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "reward_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "user_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "reward_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "instructions"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "box_count",
+          "type": "u8"
+        },
+        {
+          "name": "nonce_counter",
+          "type": "u64"
+        },
+        {
+          "name": "player_entropy",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "backend_commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "backend_seed",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "expires_at",
+          "type": "i64"
+        },
+        {
+          "name": "signature",
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "register_agent",
+      "docs": [
+        "User authorizes a specific agent (e.g. RaiderBot's per-user hot",
+        "wallet) to call `open_box_as_agent` on their behalf for a bounded",
+        "time window. The agent never gains custody of GET or SOL beyond",
+        "the FuelVault outflows defined by this program."
+      ],
+      "discriminator": [
+        135,
+        157,
+        66,
+        195,
+        2,
+        113,
+        175,
+        30
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "agent_authority",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "agent_pubkey",
+          "type": "pubkey"
+        },
+        {
+          "name": "allowed_actions",
+          "type": "u32"
+        },
+        {
+          "name": "expiry_ts",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "request_lootbox_batch",
+      "docs": [
+        "Open up to MAX_BOXES_PER_BATCH boxes in a single tx. Player + backend",
+        "co-sign; backend is feePayer + rent payer so the player's only",
+        "outflow is `box_count * LOOTBOX_FEE_LAMPORTS` to TREASURY.",
+        "",
+        "Stores both halves of the commit-reveal (`player_entropy` +",
+        "`backend_commitment`) in the LootboxBatchRequest PDA. The actual",
+        "dice are rolled in `consume_lootbox_batch` after the backend",
+        "reveals its secret."
+      ],
+      "discriminator": [
+        62,
+        86,
+        154,
+        9,
+        95,
+        249,
+        182,
+        152
+      ],
+      "accounts": [
+        {
+          "name": "backend_signer",
+          "docs": [
+            "Backend hot wallet — pays network fees + rent + co-signs the tx."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "player",
+          "docs": [
+            "Player — signs to authorize the SystemProgram.transfer to TREASURY."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "lootbox_batch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  111,
+                  111,
+                  116,
+                  98,
+                  111,
+                  120,
+                  95,
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              },
+              {
+                "kind": "arg",
+                "path": "nonce"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101,
+                  95,
+                  118,
+                  51
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "instructions"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "box_count",
+          "type": "u8"
+        },
+        {
+          "name": "nonce",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "player_entropy",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "backend_commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "expires_at",
+          "type": "i64"
+        },
+        {
+          "name": "signature",
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "restock_tier",
+      "docs": [
+        "Admin restock for any tier (1..=10)."
+      ],
+      "discriminator": [
+        174,
+        38,
+        133,
+        191,
+        162,
+        221,
+        105,
+        76
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "inventory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  118,
+                  101,
+                  110,
+                  116,
+                  111,
+                  114,
+                  121,
+                  95,
+                  118,
+                  50
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "tier",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "revoke_agent",
+      "docs": [
+        "Revoke an agent. Either party may sign:",
+        "- the user (kicking the bot out — the normal \"Revoke agent\" flow)",
+        "- the agent itself (bot self-resigning, e.g. on /resign)",
+        "Sets `revoked = true`. The FuelVault drain is a separate",
+        "`withdraw_fuel` ix; clients should bundle both into one tx so",
+        "/istifa is atomic from the user's perspective."
+      ],
+      "discriminator": [
+        227,
+        60,
+        209,
+        125,
+        240,
+        117,
+        163,
+        73
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "docs": [
+            "Either the user or the registered agent — verified in the handler",
+            "against `agent_authority.user` / `.agent_pubkey`."
+          ],
+          "signer": true
+        },
+        {
+          "name": "user",
+          "docs": [
+            "seed-match enforces equality with `agent_authority.user`."
+          ]
+        },
+        {
+          "name": "agent_authority",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_backend_signer",
+      "discriminator": [
+        184,
+        18,
+        166,
+        187,
+        145,
+        128,
+        100,
+        160
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "inventory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  118,
+                  101,
+                  110,
+                  116,
+                  111,
+                  114,
+                  121,
+                  95,
+                  118,
+                  50
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "backend_signer",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "withdraw_fuel",
+      "docs": [
+        "Withdraw SOL from the FuelVault back to the user.",
+        "`amount = None` drains the vault to zero — used by /resign.",
+        "Either the user or the registered agent may sign, but the",
+        "destination is *always* `agent_authority.user`. This is the",
+        "on-chain enforcement of \"the agent cannot touch your money\" — the agent",
+        "can only ever push fuel back to its delegator, never to itself",
+        "or any third party."
+      ],
+      "discriminator": [
+        67,
+        46,
+        7,
+        149,
+        112,
+        231,
+        24,
+        218
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "docs": [
+            "Either the user or the registered agent. Destination is locked",
+            "to `user` (which is constrained to `agent_authority.user`), so the",
+            "agent can only ever push fuel back to its delegator."
+          ],
+          "signer": true
+        },
+        {
+          "name": "user",
+          "writable": true
+        },
+        {
+          "name": "agent_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fuel_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  117,
+                  101,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": {
+            "option": "u64"
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AgentAuthority",
+      "discriminator": [
+        161,
+        225,
+        83,
+        39,
+        179,
+        98,
+        31,
+        118
+      ]
+    },
+    {
+      "name": "Config",
+      "discriminator": [
+        155,
+        12,
+        170,
+        224,
+        30,
+        250,
+        204,
+        130
+      ]
+    },
+    {
+      "name": "GlobalInventory",
+      "discriminator": [
+        180,
+        153,
+        7,
+        68,
+        9,
+        1,
+        46,
+        106
+      ]
+    },
+    {
+      "name": "LootboxBatchRequest",
+      "discriminator": [
+        179,
+        74,
+        100,
+        136,
+        198,
+        156,
+        62,
+        244
+      ]
+    },
+    {
+      "name": "PlayerStateV3",
+      "discriminator": [
+        111,
+        221,
+        26,
+        110,
+        84,
+        114,
+        27,
+        151
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "AgentBoxOpened",
+      "discriminator": [
+        84,
+        251,
+        1,
+        142,
+        35,
+        198,
+        111,
+        58
+      ]
+    },
+    {
+      "name": "AgentRegistered",
+      "discriminator": [
+        191,
+        78,
+        217,
+        54,
+        232,
+        100,
+        189,
+        85
+      ]
+    },
+    {
+      "name": "AgentRevocation",
+      "discriminator": [
+        87,
+        217,
+        5,
+        14,
+        91,
+        147,
+        168,
+        233
+      ]
+    },
+    {
+      "name": "LootboxBatchRevealed",
+      "discriminator": [
+        25,
+        179,
+        166,
+        18,
+        243,
+        51,
+        146,
+        93
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidBoxTier",
+      "msg": "Invalid lootbox tier."
+    },
+    {
+      "code": 6001,
+      "name": "SignatureExpired",
+      "msg": "Backend signature has expired."
+    },
+    {
+      "code": 6002,
+      "name": "MissingSignatureInstruction",
+      "msg": "Missing Ed25519 signature instruction."
+    },
+    {
+      "code": 6003,
+      "name": "InvalidSignatureInstruction",
+      "msg": "Invalid Ed25519 signature instruction."
+    },
+    {
+      "code": 6004,
+      "name": "InvalidSignature",
+      "msg": "Invalid backend signature."
+    },
+    {
+      "code": 6005,
+      "name": "InvalidSignatureSigner",
+      "msg": "Invalid backend signature signer."
+    },
+    {
+      "code": 6006,
+      "name": "InvalidSignatureMessage",
+      "msg": "Invalid backend signature message."
+    },
+    {
+      "code": 6007,
+      "name": "InvalidInstructionsSysvar",
+      "msg": "Invalid sysvar instructions account."
+    },
+    {
+      "code": 6008,
+      "name": "InvalidPlayer",
+      "msg": "Invalid player for this request."
+    },
+    {
+      "code": 6009,
+      "name": "InvalidBackendSigner",
+      "msg": "Invalid backend signer."
+    },
+    {
+      "code": 6010,
+      "name": "InvalidTreasury",
+      "msg": "Invalid treasury account."
+    },
+    {
+      "code": 6011,
+      "name": "InvalidRewardMint",
+      "msg": "Invalid reward mint."
+    },
+    {
+      "code": 6012,
+      "name": "AlreadyConsumed",
+      "msg": "Lootbox request has already been consumed."
+    },
+    {
+      "code": 6013,
+      "name": "InvalidBackendCommitment",
+      "msg": "Backend seed does not match the on-chain commitment."
+    },
+    {
+      "code": 6014,
+      "name": "InventoryUnderflow",
+      "msg": "Inventory underflow."
+    },
+    {
+      "code": 6015,
+      "name": "InventoryExhausted",
+      "msg": "All inventory tiers are exhausted."
+    },
+    {
+      "code": 6016,
+      "name": "InvalidBoxCount",
+      "msg": "Box count must be between 1 and 10."
+    },
+    {
+      "code": 6017,
+      "name": "DailyLimitExceeded",
+      "msg": "Daily box limit (50 per UTC day) exceeded."
+    },
+    {
+      "code": 6018,
+      "name": "ArithmeticOverflow",
+      "msg": "Arithmetic overflow."
+    },
+    {
+      "code": 6019,
+      "name": "AgentIsRevoked",
+      "msg": "Agent has been revoked."
+    },
+    {
+      "code": 6020,
+      "name": "AgentExpired",
+      "msg": "Agent delegation has expired."
+    },
+    {
+      "code": 6021,
+      "name": "AgentActionNotAllowed",
+      "msg": "This action is not in the agent's allowed_actions bitmask."
+    },
+    {
+      "code": 6022,
+      "name": "AgentAuthorityMismatch",
+      "msg": "Authority must be either the delegating user or the registered agent."
+    },
+    {
+      "code": 6023,
+      "name": "AgentPubkeyMismatch",
+      "msg": "Agent pubkey does not match the on-chain registration."
+    },
+    {
+      "code": 6024,
+      "name": "AgentInvalidExpiry",
+      "msg": "Agent expiry must be in the future and within the maximum delegation window."
+    },
+    {
+      "code": 6025,
+      "name": "AgentInvalidActions",
+      "msg": "Agent allowed_actions bitmask is empty or contains unknown bits."
+    },
+    {
+      "code": 6026,
+      "name": "AgentNonceMismatch",
+      "msg": "Agent nonce counter mismatch — possible replay."
+    },
+    {
+      "code": 6027,
+      "name": "FuelInsufficient",
+      "msg": "Fuel vault balance is insufficient for this operation."
+    },
+    {
+      "code": 6028,
+      "name": "FuelWithdrawTooLarge",
+      "msg": "Withdraw amount exceeds fuel vault balance."
+    }
+  ],
+  "types": [
+    {
+      "name": "AgentAuthority",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "agent_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "allowed_actions",
+            "type": "u32"
+          },
+          {
+            "name": "expiry_ts",
+            "type": "i64"
+          },
+          {
+            "name": "nonce_counter",
+            "docs": [
+              "Strictly-increasing replay guard; the backend signs over the",
+              "expected value and the program enforces equality + bumps."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "revoked",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AgentBoxOpened",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "agent",
+            "type": "pubkey"
+          },
+          {
+            "name": "box_count",
+            "type": "u8"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          },
+          {
+            "name": "fuel_remaining",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AgentRegistered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "agent",
+            "type": "pubkey"
+          },
+          {
+            "name": "allowed_actions",
+            "type": "u32"
+          },
+          {
+            "name": "expiry_ts",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AgentRevocation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "agent",
+            "type": "pubkey"
+          },
+          {
+            "name": "revoked_by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BoxReward",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tier",
+            "type": "u8"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Config",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "backend_signer",
+            "type": "pubkey"
+          },
+          {
+            "name": "reward_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GlobalInventory",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "remaining",
+            "type": {
+              "array": [
+                "u32",
+                10
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LootboxBatchRequest",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "nonce",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "player_entropy",
+            "docs": [
+              "Player-supplied entropy (32 bytes from `crypto.getRandomValues`)."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "backend_commitment",
+            "docs": [
+              "`sha256(backend_secret)` — backend cannot change `backend_secret`",
+              "after the request lands."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "box_count",
+            "type": "u8"
+          },
+          {
+            "name": "consumed",
+            "type": "bool"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          },
+          {
+            "name": "rewards",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "BoxReward"
+                  }
+                },
+                10
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LootboxBatchRevealed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "box_count",
+            "type": "u8"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlayerStateV3",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "has_won_major_prize",
+            "type": "bool"
+          },
+          {
+            "name": "current_day_utc",
+            "type": "u32"
+          },
+          {
+            "name": "boxes_consumed_today",
+            "type": "u8"
+          },
+          {
+            "name": "boxes_reserved_today",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

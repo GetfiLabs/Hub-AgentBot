@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // uid === walletAddress in the SIWS architecture
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Only allow client to update lastLogin — all other writes go through Cloud Functions
+      allow update: if request.auth != null && request.auth.uid == userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["lastLogin"]);
+    }
+    match /game_links/{linkId} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+    match /transactions/{txId} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+    match /lootbox_requests/{requestId} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+    // V2 batch flow — owner can read their own batch (frontend polls this
+    // doc for status + rewards). All writes happen via Cloud Functions /
+    // the crank trigger.
+    match /lootbox_batches/{batchId} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+  }
+}

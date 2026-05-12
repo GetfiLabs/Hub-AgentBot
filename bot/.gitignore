@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.*
+!.env.example
+temp/
+
+# Secrets — never commit
+serviceAccountKey.json
+bot-op.json
+bot-op.json.*
+*.pem
+*-keypair.json
+
+# OS
+.DS_Store
