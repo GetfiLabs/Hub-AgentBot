@@ -1,5 +1,20 @@
 # GetFi — Roll Raider Hub & Agent Bot
 
+### 🖥️ Project Showcase
+![GetFi Hub Demo](./demo.png)
+*A visual preview of the GetFi dApp interface running locally.*
+
+---
+
+### 🔗 Solana Devnet Identifiers
+| Component | Address / Identifier |
+| :--- | :--- |
+| **$GET Token (V2)** | `3rTrMpMPQ3Nj7ktRkBYcLmB5diqqhtcw348oq9Poq5Eo` |
+| **Lootbox Program** | `Bm6zsJgc87Hj6gGEtpHtyjP89Lwuu7TequM6dgPL8LA7` |
+| **Program Authority** | `A3TgoR4...FqxFqxb` |
+
+---
+
 Monorepo for the GetFi hackathon submission. Contains two production services that share an on-chain `getfi_lootbox` Anchor program on Solana devnet:
 
 - **`hub/`** — Next.js 16 dApp at `hub.getfi.org`. Web2 ↔ Web3 bridge for player onboarding, wallet linking, and lootbox openings. → [hub/README.md](./hub/README.md)
