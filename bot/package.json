@@ -13,8 +13,8 @@
     "vs:list": "node src/scripts/setupVectorStore.js list"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "GetFi Labs",
+  "license": "MIT",
   "dependencies": {
     "@solana/web3.js": "^1.98.4",
     "axios": "^1.15.2",

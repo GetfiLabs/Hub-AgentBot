@@ -1,7 +1,7 @@
 /**
  * Roll Raider Players API client (Hub side).
  *
- * Contract: PLAYERS_API.md at project root.
+ * Contract: see hub/ARCHITECTURE.md §1 (Players API integration).
  * Roll Raider is the canonical source of truth for `currency` (G).
  * Hub sends deltas (idempotent) and reads `currency` from /stats responses.
  *
@@ -23,7 +23,7 @@ function apiKey() {
   return key;
 }
 
-async function request(path, {method = "GET", body} = {}) {
+async function request(path, { method = "GET", body } = {}) {
   const url = `${baseUrl()}${path}`;
   const resp = await fetch(url, {
     method,
@@ -42,8 +42,7 @@ async function request(path, {method = "GET", body} = {}) {
   }
   if (!resp.ok) {
     const err = new Error(
-      `Roll Raider API ${method} ${path} → ${resp.status} ${
-        json?.error?.message || text || ""
+      `Roll Raider API ${method} ${path} → ${resp.status} ${json?.error?.message || text || ""
       }`,
     );
     err.status = resp.status;
@@ -90,12 +89,12 @@ async function adjustCurrency({
       source,
       idempotencyKey,
       occurredAt: occurredAt || new Date().toISOString(),
-      ...(metadata ? {metadata} : {}),
+      ...(metadata ? { metadata } : {}),
     },
   });
 }
 
-async function getCurrencyTransactions(playerId, {limit, before} = {}) {
+async function getCurrencyTransactions(playerId, { limit, before } = {}) {
   const qs = new URLSearchParams();
   if (limit) qs.set("limit", String(limit));
   if (before) qs.set("before", before);
